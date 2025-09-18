@@ -11,23 +11,26 @@ export default function PaymentResult() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const paymentStatus = searchParams.get("status");
-    const errorMessage = searchParams.get("message");
+  if (!searchParams || !searchParams.has("status")) return;
 
-    if (paymentStatus === "success" || paymentStatus === "SUCCESS") {
-      setStatus("success");
-      setMessage("Ödeme başarıyla tamamlandı!");
-    } else {
-      setStatus("error");
-      setMessage(decodeURIComponent(errorMessage || "Ödeme başarısız oldu."));
-    }
-  }, [searchParams]);
+  const paymentStatus = searchParams.get("status");
+  const errorMessage = searchParams.get("message");
+
+  if (paymentStatus === "success" || paymentStatus === "SUCCESS") {
+    setStatus("success");
+    setMessage("Ödeme başarıyla tamamlandı!");
+  } else {
+    setStatus("error");
+    setMessage(decodeURIComponent(errorMessage || "Ödeme başarısız oldu."));
+  }
+}, [searchParams]);
+
 
   // 3 saniye sonra yönlendirme
   useEffect(() => {
     if (status !== "loading") {
       const timer = setTimeout(() => {
-        router.push("/payment");
+        router.push("http://localhost:3000");
       }, 3000);
       return () => clearTimeout(timer);
     }

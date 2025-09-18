@@ -1,51 +1,41 @@
-"use client";
+// app/page.tsx
+import ProductCard from "./components/ProductCard";
+import { CartProvider } from "./components/CartProvider";
+import Cart from "./components/Cart";
 
-import { useState } from "react";
+const products = [
+  {
+    id: "1",
+    name: "Kablosuz Kulaklık",
+    price: 499.99,
+    image: "https://source.unsplash.com/featured/?headphones",
+  },
+  {
+    id: "2",
+    name: "Mekanik Klavye",
+    price: 799.99,
+    image: "https://source.unsplash.com/featured/?keyboard",
+  },
+  {
+    id: "3",
+    name: "Oyun Mouse",
+    price: 299.99,
+    image: "https://source.unsplash.com/featured/?mouse",
+  },
+];
 
-export default function PaymentPage() {
-  const [cart] = useState([
-    { id: "1", name: "Ürün 1", price: 50 },
-    { id: "2", name: "Ürün 2", price: 30 },
-  ]);
-
-  const handleCheckout = async () => {
-    try {
-      const res = await fetch("http://localhost:3001/create-checkout-form", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cart,
-          buyer: {
-            name: "Ali",
-            surname: "Veli",
-            email: "ali@example.com",
-            gsmNumber: "+905551112233",
-            identityNumber: "12345678901",
-            address: "İstanbul",
-            city: "İstanbul",
-            country: "Türkiye",
-          },
-        }),
-      });
-      const data = await res.json();
-      if (data.paymentPageUrl) {
-        window.location.href = data.paymentPageUrl; // iyzico sayfasına yönlendir
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Ödeme başlatılamadı.");
-    }
-  };
-
+export default function HomePage() {
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Sepet</h1>
-      <ul>
-        {cart.map(item => (
-          <li key={item.id}>{item.name}: {item.price} ₺</li>
-        ))}
-      </ul>
-      <button onClick={handleCheckout}>Ödeme Yap</button>
-    </div>
+    <CartProvider>
+      <Cart />
+      <main className="max-w-6xl mx-auto p-4">
+        <h1 className="text-3xl font-bold mb-6">Ürünler</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </main>
+    </CartProvider>
   );
 }

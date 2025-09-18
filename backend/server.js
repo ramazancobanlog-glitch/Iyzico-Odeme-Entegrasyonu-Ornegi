@@ -32,7 +32,8 @@ app.post("/create-checkout-form", (req, res) => {
     currency: "TRY",
     basketId: `B${Date.now()}`,
     paymentGroup: "PRODUCT",
-    callbackUrl: "http://localhost:3001/api/payment/callback", // Next.js callback URL
+   callbackUrl: "http://localhost:3000/api/payment/callback",
+
     buyer: {
       id: "BY789",
       name: buyer.name,
