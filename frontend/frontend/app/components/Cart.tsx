@@ -11,6 +11,18 @@ export default function Cart() {
 
   // Ödeme sayfasına yönlendirme işlevi
   const handleCheckout = async () => {
+    // localStorage siparişi
+const newOrder = {
+  id: Date.now().toString(),
+  date: new Date().toLocaleString(),
+  total: cart.reduce((sum, item) => sum + item.price, 0),
+  items: cart.map((item) => ({ name: item.name, quantity: 1, price: item.price })),
+};
+
+const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+existingOrders.push(newOrder);
+localStorage.setItem("orders", JSON.stringify(existingOrders));
+
     setLoading(true);
     setError(null);
 
