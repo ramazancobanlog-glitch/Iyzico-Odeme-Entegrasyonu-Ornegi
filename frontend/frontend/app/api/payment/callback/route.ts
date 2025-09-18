@@ -1,41 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// İyzico'dan gelen POST callback'i
 export async function POST(request: NextRequest) {
   try {
-    const bodyText = await request.text();
-    const params = new URLSearchParams(bodyText);
-    const token = params.get("token");
+    const contentType = request.headers.get("content-type") || "";
 
-    if (!token) {
-      return NextResponse.redirect(
-        new URL(
-          `/payment-result?status=error&message=${encodeURIComponent("Eksik token")}`,
-          process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-        )
-      );
+    let token: string | null = null;
+
+    if (contentType.includes("application/x-www-form-urlencoded")) {
+      const bodyText = await request.text();
+      const params = new URLSearchParams(bodyText);
+      token = params.get("token");
+    } else if (contentType.includes("application/json")) {
+      const body = await request.json();
+      token = body.token;
     }
 
-    const apiUrl = process.env.BACKEND_URL || "http://localhost:3001";
-    const verifyUrl = `${apiUrl}/verify-payment?token=${token}`;
+    if (!token) {
+      console.error("Token gelmedi");
+      return NextResponse.redirect("http://localhost:3000/payment-result?status=error&message=Eksik+token");
+    }
 
-    const verifyResponse = await fetch(verifyUrl);
-    const result = await verifyResponse.json();
+    const verifyRes = await fetch("http://localhost:3001/api/payment/callback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    });
 
-    return NextResponse.redirect(
-      new URL(
-        `/payment-result?status=${result.status}&message=${encodeURIComponent(result.errorMessage || "")}`,
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-      )
-    );
-  } catch (error) {
-    console.error("Callback işlenirken hata:", error);
+    const result = await verifyRes.json();
 
     return NextResponse.redirect(
-      new URL(
-        `/payment-result?status=error&message=${encodeURIComponent("Callback işlenirken hata oluştu")}`,
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-      )
+      `http://localhost:3000/payment-result?status=${result.status}&message=${encodeURIComponent(result.result?.errorMessage || "")}`
     );
+  } catch (err) {
+    console.error("Hata:", err);
+    return NextResponse.redirect("http://localhost:3000/payment-result?status=error&message=Callback+hatasi");
   }
 }

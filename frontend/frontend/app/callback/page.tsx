@@ -14,15 +14,15 @@ function CallbackContent() {
     async function verifyPayment() {
       try {
         const token = searchParams.get("token");
-        const conversationId = searchParams.get("conversationId");
+       
 
-        if (!token || !conversationId) {
+        if (!token) {
           throw new Error("Gerekli parametreler eksik");
         }
 
         // API route'u kullanarak doğrulama isteği gönder
         const response = await fetch(
-          `/api/payment/callback?token=${encodeURIComponent(token)}&conversationId=${encodeURIComponent(conversationId)}`
+          `/api/payment/callback?token=${encodeURIComponent(token)}}`
         );
 
         if (!response.ok) {
@@ -39,10 +39,7 @@ function CallbackContent() {
           alert("Ödeme durumu belirsiz.");
         }
 
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Beklenmeyen bir hata oluştu";
-        console.error("Ödeme doğrulama hatası:", err);
-        setError(errorMessage);
+    
       } finally {
         setIsLoading(false);
         setTimeout(() => {
