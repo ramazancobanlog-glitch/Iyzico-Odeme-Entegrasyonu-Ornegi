@@ -1,3 +1,4 @@
+import { get } from "http";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
       console.log("Body (json):", body);
       token = body.token;
     }
-
+          
     if (!token) {
       console.error("Token gelmedi");
       return NextResponse.redirect("http://localhost:3000/payment-result?status=error&message=Eksik+token");
@@ -43,10 +44,16 @@ export async function POST(request: NextRequest) {
 
     const status = result?.status === "success" ? "success" : "error";
     const message = result?.result?.errorMessage || "";
+        
 
-    return NextResponse.redirect(`http://localhost:3000/payment-result?status=${status}&message=${encodeURIComponent(message)}`);
+   return NextResponse.redirect(
+  `http://localhost:3000/payment-result?status=${status}&message=${encodeURIComponent(message)}`,
+  303
+);
+
   } catch (err) {
     console.error("Hata:", err);
     return NextResponse.redirect("http://localhost:3000/payment-result?status=error&message=Callback+hatasi");
   }
+ 
 }
