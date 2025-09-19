@@ -1,32 +1,23 @@
-// app/components/ProductCard.tsx
 "use client";
-import { motion } from "framer-motion";
-import { useCart } from "./CartProvider";
 
-type Product = {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-};
+import { useCart, Product } from "./CartProvider";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
 
   return (
-    <motion.div
-      whileHover={{ scale: 1.03 }}
-      className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center"
-    >
-      <img src={product.image} alt={product.name} className="w-40 h-40 object-cover rounded" />
-      <h3 className="mt-2 text-lg font-semibold">{product.name}</h3>
-      <p className="text-gray-500 mb-2">{product.price.toFixed(2)} ₺</p>
-      <button
-        onClick={() => addToCart(product)}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-      >
-        Sepete Ekle
-      </button>
-    </motion.div>
+    <div className="bg-gray-100 dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:scale-105 transform transition">
+      <img src={product.image} alt={product.name} className="w-full h-56 object-cover" />
+      <div className="p-4">
+        <h4 className="text-xl font-semibold mb-2">{product.name}</h4>
+        <p className="text-green-600 dark:text-green-400 font-bold text-lg mb-4">{product.price} ₺</p>
+        <button
+          onClick={() => addToCart(product)}
+          className="w-full py-2 bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 rounded transition text-white font-semibold"
+        >
+          Sepete Ekle
+        </button>
+      </div>
+    </div>
   );
 }

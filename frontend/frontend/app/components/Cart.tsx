@@ -1,4 +1,5 @@
 "use client";
+
 import { useCart } from "./CartProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
@@ -9,32 +10,27 @@ export default function Cart() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Ödeme sayfasına yönlendirme işlevi
   const handleCheckout = async () => {
-    // localStorage siparişi
-const newOrder = {
-  id: Date.now().toString(),
-  date: new Date().toLocaleString(),
-  total: cart.reduce((sum, item) => sum + item.price, 0),
-  items: cart.map((item) => ({ name: item.name, quantity: 1, price: item.price })),
-};
-
-const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]");
-existingOrders.push(newOrder);
-localStorage.setItem("orders", JSON.stringify(existingOrders));
+    const newOrder = {
+      id: Date.now().toString(),
+      date: new Date().toISOString(),
+      total: cart.reduce((sum, item) => sum + item.price, 0),
+      items: cart.map(i => ({ name: i.name, quantity: 1, price: i.price })),
+    };
+    const existingOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+    existingOrders.push(newOrder);
+    localStorage.setItem("orders", JSON.stringify(existingOrders));
 
     setLoading(true);
     setError(null);
 
     try {
-      // Backend URL'ini kendi ayarına göre değiştir
-      const response = await fetch("http://localhost:3001/create-checkout-form", {
+      const res = await fetch("http://localhost:3001/create-checkout-form", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           cart,
           buyer: {
-            // Örnek sabit bilgiler, bunu kullanıcıdan alabilirsin
             name: "Ali",
             surname: "Veli",
             gsmNumber: "+905555555555",
@@ -47,17 +43,10 @@ localStorage.setItem("orders", JSON.stringify(existingOrders));
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Ödeme formu oluşturulamadı");
-      }
-
-      const data = await response.json();
-
-      if (data.paymentPageUrl) {
-        window.location.href = data.paymentPageUrl; // Iyzipay ödeme sayfasına yönlendir
-      } else {
-        throw new Error("Ödeme sayfası URL'si alınamadı");
-      }
+      if (!res.ok) throw new Error("Ödeme formu oluşturulamadı");
+      const data = await res.json();
+      if (data.paymentPageUrl) window.location.href = data.paymentPageUrl;
+      else throw new Error("Ödeme sayfası URL'si alınamadı");
     } catch (err: any) {
       setError(err.message || "Bilinmeyen hata");
       setLoading(false);
@@ -67,10 +56,10 @@ localStorage.setItem("orders", JSON.stringify(existingOrders));
   return (
     <div className="relative">
       <button
-        className="fixed top-4 right-4 z-50 bg-white shadow-md rounded-full p-3"
-        onClick={() => setOpen((prev) => !prev)}
+        className="fixed top-6 right-6 z-50 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 shadow-lg rounded-full p-4 hover:scale-110 transform transition"
+        onClick={() => setOpen(prev => !prev)}
       >
-        🛒 <span className="ml-1 text-sm font-semibold">({cart.length})</span>
+        🛒 <span className="ml-1 font-semibold">({cart.length})</span>
       </button>
 
       <AnimatePresence>
@@ -79,30 +68,33 @@ localStorage.setItem("orders", JSON.stringify(existingOrders));
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute right-0 mt-2 w-72 bg-white shadow-lg rounded p-4 z-40"
+            className="absolute right-6 mt-2 w-80 bg-gray-900 dark:bg-gray-100 text-gray-100 dark:text-gray-900 shadow-2xl rounded-xl p-5 z-40"
           >
-            <h4 className="text-lg font-bold mb-2">Sepet</h4>
+            <h4 className="text-xl font-bold mb-3">Sepet</h4>
+
             {cart.length === 0 ? (
-              <p>Sepetiniz boş</p>
+              <p className="text-gray-400 dark:text-gray-600 text-center py-6">Sepetiniz boş</p>
             ) : (
               <>
-                <ul className="max-h-40 overflow-y-auto">
+                <ul className="max-h-64 overflow-y-auto divide-y divide-gray-700 dark:divide-gray-300">
                   {cart.map((item, i) => (
-                    <li key={i} className="flex justify-between border-b py-1 text-sm">
+                    <li key={i} className="flex justify-between py-2 text-sm">
                       <span>{item.name}</span>
-                      <span>{item.price.toFixed(2)} ₺</span>
+                      <span className="font-semibold">{item.price.toFixed(2)} ₺</span>
                     </li>
                   ))}
                 </ul>
 
-                {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
+                {error && <p className="text-red-500 mt-3 text-sm">{error}</p>}
 
                 <button
                   disabled={loading}
                   onClick={handleCheckout}
-                  className={`mt-4 w-full py-2 rounded text-white font-semibold ${
-                    loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
-                  }`}
+                  className={`mt-5 w-full py-3 rounded-xl font-semibold ${
+                    loading
+                      ? "bg-gray-600 cursor-not-allowed text-gray-300"
+                      : "bg-green-600 hover:bg-green-700 text-white"
+                  } transition`}
                 >
                   {loading ? "Yönlendiriliyor..." : "Sepeti Onayla"}
                 </button>
