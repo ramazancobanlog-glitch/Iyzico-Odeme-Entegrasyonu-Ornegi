@@ -7,9 +7,10 @@ import { ThemeProvider, useTheme } from "./components/ThemeProvider";
 import Link from "next/link";
 
 const products = [
-  { id: "1", name: "Kablosuz Kulaklık", price: 499.99, image: "https://source.unsplash.com/featured/?headphones" },
+  { id: "1", name: "Kablosuz Kulaklık", price: 499.99 , image: "https://source.unsplash.com/featured/?headphones" },
   { id: "2", name: "Mekanik Klavye", price: 799.99, image: "https://source.unsplash.com/featured/?keyboard" },
-  { id: "3", name: "Oyun Mouse", price: 299.99, image: "https://source.unsplash.com/featured/?mouse" },
+  { id: "3", name: "Oyun Mouse", price: 299.99, image: "/images/mouse.jpg"
+},
 ];
 
 export default function HomePage() {
@@ -24,6 +25,7 @@ export default function HomePage() {
 
 function MainContent() {
   const { theme, toggleTheme } = useTheme();
+  
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <header className="max-w-7xl mx-auto p-6 flex justify-between items-center">

@@ -27,12 +27,14 @@ export default function Orders({ orders }: OrdersProps) {
   }
 
   return (
+    
     <ul className="space-y-6 max-w-4xl mx-auto">
       {orders.map((order) => (
         <li
-          key={order.id}
-          className="border rounded-md p-6 shadow-sm hover:shadow-md transition"
-        >
+  key={order.id}
+  className="border rounded p-4 shadow bg-white dark:bg-gray-800 text-black dark:text-gray-100"
+>
+
           <div className="flex justify-between mb-4">
             <span className="font-semibold">Sipariş No:</span>
             <span>{order.id}</span>
